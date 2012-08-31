@@ -72,10 +72,15 @@ var Validator = {
         validateParents:function(element, args , errors, displayFunction){
             //
         },
+        validateChildren:function(element, args , errors, displayFunction){
+
+            alert("validate children");
+
+            return {form:"form has Errors"};
+        },
         ajaxTest:function(element, args , errors, displayFunction){
             debugger;
             setTimeout(function(){
-                debugger;
                 errors["addedAjax"] = "added an ajax call";
                 Validator.display[displayFunction].call(this,element,errors);
             }, 2000);
@@ -89,6 +94,13 @@ var Validator = {
         }
     },
     display:{
+        alertError:function(element,errors){
+            var errorStr = "This is the default error display handler:\nTo stop seeing this, set 'errorDisplay' in your config.\n\n";
+            for(e in errors){
+                errorStr += JS.STRING.format("test[%1]\n - fails with message[%2]\n",e,errors[e]);
+            }
+            alert(errorStr);
+        },
         showElementErrors:function(element,errors){
             var $element = $(element);
             $element.parent().find(".errormessage").remove();
@@ -96,7 +108,7 @@ var Validator = {
                 $(element).after("<p class='errormessage'>"+e+": " + errors[e] +"</p>");
             }
         },
-        showCamelotError:function(element, errors){
+        show_Camelot_Error:function(element, errors){
             var $element = $(element);
             var $item = $element.closest(".item");
             $item.removeClass("error").removeClass("valid");
@@ -131,7 +143,7 @@ var Validator = {
         if(this.regex[ruleName]){
             return this.runRegex(element, ruleName);
         }else{
-            var rule = (_.isFunction(ruleName))?ruleName:JS.OBJECT.getChildObject(this.rules,ruleName);
+            var rule = (_.isFunction(ruleName))?ruleName:JS.OBJECT.getProperty(this.rules,ruleName);
             if(!rule){
                 throw new Error("Rule is undefined: " + ruleName);
             }
@@ -161,6 +173,10 @@ var Validator = {
                     errors = _.extend(errors, this.runAllRules(element, rule, errors, displayFunction, true));
                 }else{
                     errors = _.extend(errors, this.runRule(element, rule, errors, displayFunction));
+                }
+
+                if(!_.isEmpty(errors) && !continueOnError){
+                    return errors;
                 }
 
             }
@@ -200,7 +216,7 @@ var Validator = {
         // get data-attr based rules
         var changeRules = this.parseRules(JS.DOM.DATA.getElementData(element,"changeRules",this.configAttributeName, false));
         var submitRules = this.parseRules(JS.DOM.DATA.getElementData(element,"submitRules",this.configAttributeName, false));
-        var errorsDisplayFunc = JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "showElementErrors");
+        var errorsDisplayFunc = JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "alertError");
 
         // always run changeRules
         var errors = {};
@@ -242,11 +258,6 @@ var Validator = {
 jQuery(function($){
     var boundValidatorTrigger = _.bind(Validator.triggerValidation, Validator);
     $(document).on("submit.form.validation","form",{type:"submit"}, boundValidatorTrigger);
-    $(document).on("blur.form.validation","input,textarea",{type:"change"},boundValidatorTrigger);
+    $(document).on("blur.form.validation","input,textarea,select",{type:"change"},boundValidatorTrigger);
     $(document).on("change.form.element.validation","select,option",{type:"change"},boundValidatorTrigger);
 });
-
-
-
-
-

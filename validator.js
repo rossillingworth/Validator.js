@@ -23,6 +23,8 @@ function ifAgain(){
 
 var Validator = {
 
+    debug:true,
+
     configAttributeName:"validator-config",
 
     StopValidationException:function(message){
@@ -125,12 +127,33 @@ var Validator = {
                 alert(errorStr);
             }
         },
+        setClass:function(element,errors,args){
+            // setup
+            debugger;
+            var $element = $(element);
+            args = args || "valid,error";
+            args = args.split(",");
+            // remove all currently displayed errors
+            var $parent = $element.parent();
+            $parent.removeClass(args.join(" "));
+            // if got any errors, show errors
+            if(_.isEmpty(errors)){
+                $parent.addClass(args[0]);
+            }else{
+                $parent.addClass(args[1]);
+            }
+        },
+        /**
+         * Show field errors/valid in field container
+         * @param element
+         * @param errors
+         */
         showErrorsInParentElement:function(element,errors){
             // setup
             var $element = $(element);
             var $parent = $element.parent();
             // remove all currently displayed errors
-            $parent.removeClass("error");
+            $parent.removeClass("error valid");
             $parent.find(".errorMessage").remove();
             // if got any errors, show errors
             if(!_.isEmpty(errors)){
@@ -138,14 +161,22 @@ var Validator = {
                     JS.DOM.createElement("p",{className:"errorMessage",innerHTML:error},$parent.get(0));
                 });
                 $parent.addClass("error");
+            }else{
+                $parent.addClass("valid");
             }
         },
+        /**
+         * Look for an error container for the form
+         * Push form error message into container
+         * @param element
+         * @param errors
+         */
         showFormErrorsInContainer:function(element,errors){
             // setup
             var $form = $(element);
             var $container = $form.find(".errorContainer");
             // remove all currently displayed errors
-            $form.removeClass("error");
+            $form.removeClass("formError");
             $form.find(".formErrorMessage").remove();
             // if got any errors, show errors
             if(!_.isEmpty(errors)){
@@ -153,7 +184,7 @@ var Validator = {
                     var errorMsgEl = JS.DOM.createElement("p",{className:"formErrorMessage",innerHTML:error});
                     $container.append(errorMsgEl);
                 });
-                $form.addClass("error");
+                $form.addClass("formError");
             }
         },
 
@@ -196,7 +227,7 @@ var Validator = {
             if(!rule){
                 throw new Error("Rule is undefined: " + ruleName);
             }
-            var args = JS.DOM.DATA.getElementData(element,ruleName,this.configAttributeName, false)
+            var args = JS.DOM.DATA.getElementData(element,ruleName,this.configAttributeName, false);
             return rule(element, args, errors, displayFunction);
         }
     },
@@ -239,6 +270,30 @@ var Validator = {
         return errors;
     },
 
+    runDisplay:function(element, displayName, errors){
+        var displayFunc = (_.isFunction(displayName))?displayName:JS.OBJECT.getProperty(this.display,displayName);
+        if(!displayFunc){
+            throw new Error("Unknown Display Function: " + displayName);
+        }
+        var args = JS.DOM.DATA.getElementData(element,displayName,this.configAttributeName, false);
+        return displayFunc(element, errors, args);
+    },
+
+    /**
+     * run all the error displays specified for the element
+     * @param element
+     * @param errors
+     * @param displays
+     */
+    runAllDisplays:function(element,displays,errors){
+        // iterate over displays
+        for(num in displays){
+            var displayName = displays[num];
+            this.runDisplay(element,displayName,errors);
+        }
+    },
+
+
     /**
      * parse validation rules
      * comma seperated means stop on failure
@@ -257,6 +312,22 @@ var Validator = {
         return rules;
     },
 
+    /**
+     * Parse display string from the config to an array
+     * while allowing a config-object to specify an array directly,
+     * eg: an array of functions
+     *
+     * @param displays
+     * @return {*}
+     */
+    parseDisplay:function(displays){
+        if(_.isString(displays)){
+            var firstCut = (displays)?displays.split(","):[];
+            displays = _.map(firstCut,JS.ARRAY.recursiveFunctionCallGenerator(JS.STRING.trim, _.map));
+        }
+        return displays;
+    },
+
     validate:function(element){
 
         // var to only allow rules to run once, ie: when allowed == true
@@ -264,14 +335,14 @@ var Validator = {
 
         // get data-attr based rules
         var rules = this.parseRules(JS.DOM.DATA.getElementData(element,"rules",this.configAttributeName, false));
-        var errorsDisplayFunc = JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "alertError");
+        var displays = this.parseDisplay(JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "alertError"));
 
         // run rules
         var errors = {};
-        errors = this.runAllRules(element, rules, errors, errorsDisplayFunc);
+        errors = this.runAllRules(element, rules, errors, displays);
 
-        // show errors
-        this.display[errorsDisplayFunc](element,errors);
+        // display result: ie: valid or errors
+        this.runAllDisplays(element,displays,errors);
 
         // stop submit propagating
         return errors;
@@ -289,7 +360,8 @@ var Validator = {
             return _.isEmpty(errors);
         }catch(e){
             // this will catch and stop the form from submitting if there are errors
-            if(confirm("validation error\n Do you want to stop form submitting?")){
+            if(Validator.debug && confirm("validation error","Do you want to debug now?\n ie: before the form submits?")){
+                debugger;
                 return false;
             }
             throw e;

@@ -7,21 +7,19 @@
     <link rel="stylesheet" type="text/css" href="example1.css"/>
     <style>
 
-            /* Control error background colours */
+        /* for Form level errors */
+        .formError{background-color: white;border:3px solid red;}
+        .errorContainer{display:none;text-align: center;background-color: yellow;color:red;}
+        .formError .errorContainer{display:block;}
+
+        /* for Field level errors */
         .error{background-color: #ffb6c1;}
-        form.error{background-color: white;}
-
-            /* Do NOT display */
-        .errorMessage  {display:none;}
-        .errorContainer{display:none;}
-
-            /* Display when error class is set */
-        .error .errorContainer{display:block;}
+        .errorMessage  {display:none;text-align: center;color:red;}
         .error .errorMessage  {display:block;}
 
-            /* Basic style of error display */
-        .errorContainer{text-align: center;background-color: yellow;color:red;}
-        .errorMessage{text-align: center;color:red;}
+        .error .stateImg{display:inline-block;background-image:url(cross.png);}
+        .valid .stateImg{display:inline-block;background-image:url(tick.png);}
+        .stateImg{width:16px;height:16px;background-color:yellow;}
 
     </style>
 
@@ -58,13 +56,14 @@
 
     <p id="fm-intro">Fields in <strong>bold</strong> are required.</p>
     <div class="errorContainer"></div>
-    <form id="fm-form" method="post" action="http://www.stylephreak.com/index.php/archives/2004/08/standard-forms/" data-rules="validateChildren" data-errorDisplay="showFormErrorsInContainer">
+    <form id="fm-form" method="post" action="http://www.stylephreak.com/index.php/archives/2004/08/standard-forms/" data-rules="validateChildren" data-errorDisplay="showFormErrorsInContainer" data-setClass="validForm,invalidForm">
         <div class="errorContainer"></div>
         <fieldset>
             <legend>Personal information</legend>
             <div class="fm-req">
                 <label for="fm-firstname">First name:</label>
-                <input name="fm-firstname" id="fm-firstname" type="text" data-rules="required" data-errorDisplay="showErrorsInParentElement" />
+                <input name="fm-firstname" id="fm-firstname" type="text" data-rules="required,minLength" data-minLength="5" data-errorDisplay="showErrorsInParentElement" />
+                <img class="stateImg">
                 <!--<p class="errorMessage" style="text-align: center;">this is an error</p>-->
             </div>
             <div class="fm-opt">
@@ -74,6 +73,7 @@
             <div class="fm-req">
                 <label for="fm-lastname">Last name:</label>
                 <input name="fm-lastname" id="fm-lastname" type="text" data-rules="required" data-errorDisplay="showErrorsInParentElement"/>
+                <img class="stateImg">
             </div>
         </fieldset>
         <fieldset>
@@ -81,10 +81,12 @@
             <div class="fm-opt">
                 <label for="fm-addr">Address:</label>
                 <input id="fm-addr" name="fm-addr" type="text"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-city">City or Town:</label>
                 <input id="fm-city" name="fm-city" type="text"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-state">State:</label>
@@ -164,10 +166,12 @@
                     <option value="WY">Wyoming</option>
                     <option value="YT">Yukon Territory</option>
                 </select>
+                <img class="stateImg">
             </div>
             <div class="fm-req">
                 <label for="fm-zipcode">Zip code:</label>
                 <input id="fm-zipcode" name="fm-zipcode" type="text" data-rules="required" data-errorDisplay="showErrorsInParentElement"/>
+                <img class="stateImg">
             </div>
         </fieldset>
         <fieldset>
@@ -175,26 +179,32 @@
             <div class="fm-req">
                 <label for="fm-telephone">Telephone:</label>
                 <input id="fm-telephone" name="fm-telephone" type="text" title="Enter Phone Number in xxx-xxx-xxxx format" data-rules="required,telephone" data-errorDisplay="showErrorsInParentElement"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-fax">Fax:</label>
                 <input id="fm-fax" name="fm-fax" type="text" title="Enter Fax Number in xxx-xxx-xxxx format" data-rules="notRequired,telephone" data-errorDisplay="showErrorsInParentElement"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-mobile">Mobile:</label>
                 <input id="fm-mobile" name="fm-mobile" type="text"/>
+                <img class="stateImg">
             </div>
             <div class="fm-req">
                 <label for="fm-email">Email:</label>
                 <input id="fm-email" name="fm-email" type="text" tabindex="" data-rules="required,email" data-errorDisplay="showErrorsInParentElement"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-url">Web site address:</label>
                 <input id="fm-url" name="fm-url" type="text"/>
+                <img class="stateImg">
             </div>
             <div class="fm-opt">
                 <label for="fm-comments">Comments:</label>
                 <textarea name="fm-comments" cols="10" rows="5" id="fm-comments"></textarea>
+                <img class="stateImg">
             </div>
             <div class="fm-multi">
                 <div class="fm-opt"> <p>Would you like to be notified of future updates?</p>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Test validation framework</title>
+
+    <script type="text/javascript" src="/static/bundle-bundle_core_head.js"></script>
+    <script type="text/javascript" src="/static/bundle-bundle_core_layout_defer.js"></script>
+
+    <!--<script type="text/javascript" src="/javascript/thirdparty/JS.js"></script>-->
+    <script type="text/javascript" src="/javascript/widget/validation_core.js"></script>
+
+</head>
+<body>
+
+<h1>Validation test</h1>
+
+<script>
+
+    var test = {
+        config:{
+            changeRules:"required,testError,showErrors,email",
+            testError:"bar",
+            email:""
+        }
+    };
+
+</script>
+
+
+<form method="post">
+    <div class="container">
+        <label for="textfield">Text</label>
+        <input name="text" data-changeRules="testError,ajaxTest" data-testError="1,2,3,'some text'" id="textfield" value=""/><br/>
+    </div>
+
+    <hr/>
+
+    <div>
+        <label for="textfield2">Text2</label>
+        <input name="text" data-validator-config="test.config" id="textfield2" value=""/>
+    </div>
+
+    <hr/>
+
+    <div>
+        <label for="textfield3">Text3</label>
+        <input name="text" data-changeRules="conditionalTest, minLength, testError, ajaxTest" data-minLength="5" data-conditionalTest="specify test" data-testError="1,2,3,'some text'" id="textfield3" value=""/>
+    </div>
+
+    <select id="selectList">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+    </select>
+
+</form>
+
+</body>
+</html>

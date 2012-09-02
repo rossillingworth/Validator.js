@@ -1,4 +1,3 @@
-
 // <input data-changeRules="required email minLength validateParents" data-minLength="3" data-required="3" data-email="@camelot,73,'a lot of text'">
 // <input data-validator-config="myObj.myConfig.configObjectName">
 
@@ -42,6 +41,7 @@ var Validator = {
         }
     },
     messages:{
+        form:"Please fix the errors in the form.",
         test:"this is a test error",
         required:"this field is required",
         minLength:"must be longer than %1"
@@ -62,7 +62,11 @@ var Validator = {
             return (passesTest)?{}:{required:Validator.messages.required};
         },
         notRequired:function(element, args, errors, displayFunction){
-            var passesTest = ($(element).val());
+            var $element = $(element);
+            if($element.val().length == 0){
+                throw new Validator.StopValidationException("condition failed");
+            }
+            return {};
         },
         minLength:function(element, args, errors, displayFunction){
             var len = args[0] || 1;
@@ -74,12 +78,24 @@ var Validator = {
         },
         validateChildren:function(element, args , errors, displayFunction){
 
-            alert("validate children");
+            console.log("validating children");
+            var children = JS.DOM.FORM.getFormElements(element);
+            children = children.filter(JS.DOM.isVisible);
+            // iterate children
+            _.each(children,function(child){
+                errors = _.extend(errors,Validator.validate(child));
+            });
 
-            return {form:"form has Errors"};
+            if(!_.isEmpty(errors)){
+                for(n in errors){
+                    delete(errors[n]);
+                }
+                errors = _.extend(errors,JS.OBJECT.createFromArgPairs("form",Validator.messages.form));
+            }
+
+            return errors;
         },
         ajaxTest:function(element, args , errors, displayFunction){
-            debugger;
             setTimeout(function(){
                 errors["addedAjax"] = "added an ajax call";
                 Validator.display[displayFunction].call(this,element,errors);
@@ -95,19 +111,52 @@ var Validator = {
     },
     display:{
         alertError:function(element,errors){
-            var errorStr = "This is the default error display handler:\nTo stop seeing this, set 'errorDisplay' in your config.\n\n";
-            for(e in errors){
-                errorStr += JS.STRING.format("test[%1]\n - fails with message[%2]\n",e,errors[e]);
+            if(!_.isEmpty(errors)){
+                var errorStr = [
+                    "This is the default error display handler:",
+                    JS.STRING.format("triggered by element[%1]with name[%2]",element.id,element.name),
+                    "To stop seeing this, set the 'errorDisplay' property in your config.",
+                    "A console log has been generated showing the element that caused this."
+                ].join("\n");
+                console.log("alertError displayed for:", element);
+                for(e in errors){
+                    errorStr += JS.STRING.format("test[%1]\n - fails with message[%2]\n",e,errors[e]);
+                }
+                alert(errorStr);
             }
-            alert(errorStr);
         },
-        showElementErrors:function(element,errors){
+        showErrorsInParentElement:function(element,errors){
+            // setup
             var $element = $(element);
-            $element.parent().find(".errormessage").remove();
-            for(e in errors){
-                $(element).after("<p class='errormessage'>"+e+": " + errors[e] +"</p>");
+            var $parent = $element.parent();
+            // remove all currently displayed errors
+            $parent.removeClass("error");
+            $parent.find(".errorMessage").remove();
+            // if got any errors, show errors
+            if(!_.isEmpty(errors)){
+                _.each(errors,function(error){
+                    JS.DOM.createElement("p",{className:"errorMessage",innerHTML:error},$parent.get(0));
+                });
+                $parent.addClass("error");
             }
         },
+        showFormErrorsInContainer:function(element,errors){
+            // setup
+            var $form = $(element);
+            var $container = $form.find(".errorContainer");
+            // remove all currently displayed errors
+            $form.removeClass("error");
+            $form.find(".formErrorMessage").remove();
+            // if got any errors, show errors
+            if(!_.isEmpty(errors)){
+                _.each(errors,function(error){
+                    var errorMsgEl = JS.DOM.createElement("p",{className:"formErrorMessage",innerHTML:error});
+                    $container.append(errorMsgEl);
+                });
+                $form.addClass("error");
+            }
+        },
+
         show_Camelot_Error:function(element, errors){
             var $element = $(element);
             var $item = $element.closest(".item");
@@ -203,29 +252,23 @@ var Validator = {
         if(_.isString(rules)){
             var firstCut = (rules)?rules.split(","):[];
             var secondCut = _.map(firstCut,function(data){return data.indexOf("&") > -1?data.split("&"):data;});
-            rules =  secondCut.map(JS.ARRAY.MAP.recurseWith(JS.STRING.trim));
+            rules = _.map(secondCut,JS.ARRAY.recursiveFunctionCallGenerator(JS.STRING.trim, _.map));
         }
         return rules;
     },
 
-    validate:function(element, type){
+    validate:function(element){
 
         // var to only allow rules to run once, ie: when allowed == true
         var allowed = (allowed == undefined)?true:false;
 
         // get data-attr based rules
-        var changeRules = this.parseRules(JS.DOM.DATA.getElementData(element,"changeRules",this.configAttributeName, false));
-        var submitRules = this.parseRules(JS.DOM.DATA.getElementData(element,"submitRules",this.configAttributeName, false));
+        var rules = this.parseRules(JS.DOM.DATA.getElementData(element,"rules",this.configAttributeName, false));
         var errorsDisplayFunc = JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "alertError");
 
-        // always run changeRules
+        // run rules
         var errors = {};
-        errors = this.runAllRules(element, changeRules, errors, errorsDisplayFunc);
-
-        // run submit rules if needed
-        if(type == "submit"){
-            errors = _.extend(errors, this.runAllRules(element, submitRules, errors, errorsDisplayFunc));
-        }
+        errors = this.runAllRules(element, rules, errors, errorsDisplayFunc);
 
         // show errors
         this.display[errorsDisplayFunc](element,errors);
@@ -240,10 +283,17 @@ var Validator = {
      * @return {*}
      */
     triggerValidation:function(event){
-        var element = event.target;
-        var type = event.data.type
-        var errors = this.validate(element, type);
-        return _.isEmpty(errors);
+        try{
+            var element = event.target;
+            var errors = this.validate(element);
+            return _.isEmpty(errors);
+        }catch(e){
+            // this will catch and stop the form from submitting if there are errors
+            if(confirm("validation error\n Do you want to stop form submitting?")){
+                return false;
+            }
+            throw e;
+        }
     }
 
 }
@@ -255,9 +305,5 @@ var Validator = {
 // keyup could be useful for AJAX validation, eg: username exists?
 
 
-jQuery(function($){
-    var boundValidatorTrigger = _.bind(Validator.triggerValidation, Validator);
-    $(document).on("submit.form.validation","form",{type:"submit"}, boundValidatorTrigger);
-    $(document).on("blur.form.validation","input,textarea,select",{type:"change"},boundValidatorTrigger);
-    $(document).on("change.form.element.validation","select,option",{type:"change"},boundValidatorTrigger);
-});
+
+

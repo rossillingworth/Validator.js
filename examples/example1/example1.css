@@ -1,0 +1,108 @@
+form {
+    margin:0;
+    padding:0;
+}
+
+fieldset {
+    border:none;
+    border-top:1px solid #ccc;
+    margin:1em 0;
+}
+
+legend {
+    color:#036;
+    background:transparent;
+    font-size:1.3em;
+    font-weight:700;
+    margin:1em 0;
+    padding:0 .5em;
+}
+
+label {
+    float:left;
+    width:100px;
+    text-align:right;
+    padding:0 1em;
+}
+
+fieldset div {
+    margin-bottom:.5em;
+    display:block;
+    padding:0;
+}
+
+fieldset div input,fieldset div textarea {
+    width:150px;
+    border-top:1px solid #555;
+    border-left:1px solid #555;
+    border-bottom:1px solid #ccc;
+    border-right:1px solid #ccc;
+    color:#333;
+    padding:1px;
+}
+
+fieldset div select {
+    padding:1px;
+}
+
+div.fm-multi div {
+    margin:5px 0;
+}
+
+div.fm-multi input {
+    width:1em;
+}
+
+div.fm-multi label {
+    display:block;
+    width:200px;
+    padding-left:5em;
+    text-align:left;
+}
+
+#fm-submit {
+    clear:both;
+    padding-top:1em;
+    text-align:center;
+}
+
+#fm-submit input {
+    border:1px solid #333;
+    background:#555;
+    color:#fff;
+    font-size:100%;
+    padding:2px 1em;
+}
+
+input:focus,textarea:focus {
+    background:#efefef;
+    color:#000;
+}
+
+fieldset div.fm-req {
+    font-weight:700;
+}
+
+fieldset div.fm-req label:before {
+    content:"* ";
+}
+
+body {
+    color:#333;
+    background:#fff;
+    font:12px arial,verdana,sans-serif;
+    text-align:center;
+    margin:20px;
+    padding:0;
+}
+
+#container {
+    width:350px;
+    text-align:left;
+    margin:0 auto;
+    padding:1em;
+}
+
+p#fm-intro {
+    margin:0;
+}

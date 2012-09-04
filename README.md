@@ -33,8 +33,10 @@ A Simple Form Validation
 
 ```html
 <form data-rules="validateChildren" data-errorDisplay="showFormErrors">
+<!-- a required field, form submission will fail unless it is filled in -->
 <input type="text" name="firstname" data-rules="required,noNumbers" data-errorDisplay="showFieldErrors">
-<input type="text" name="lastname" data-rules="required,noNumbers" data-errorDisplay="showFieldErrors">
+<!-- this field is not required, but will validate if it has content -->
+<input type="text" name="lastname" data-rules="notRequired,noNumbers" data-errorDisplay="showFieldErrors">
 <input type="text" name="email" data-rules="required,email" data-errorDisplay="showFieldErrors">
 <input type="submit">
 </form>

@@ -29,6 +29,7 @@ Extras:
 * configurable error messages
 * customise everything from validation to display
 * bind validations, so you can get more than 1 message, eg:required, minLength & noNumbers
+* write adapter to parse server validation config on client
 * simple error handling alerts developer to problems
 
 

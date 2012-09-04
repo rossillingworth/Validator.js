@@ -6,7 +6,7 @@ For each field specify the validation functions and provide arguments if require
 Validator handles everything else.
 
 Our easily extended mixture of functions and regex is then used to validate your forms.
-We provide a few basic examples, but you will need to add any custom functions.
+I am providing a few basic examples, but you will need to add any custom functions.
 
 Validation:
 
@@ -15,6 +15,7 @@ Validation:
 * cross field validation
 * conditional validation
 * add custom validation functions to extend rules
+* handles asynchronous AJAX functions as well (eg: isUsernameFree)
 
 Error Display:
 
@@ -81,6 +82,10 @@ var config = {
 };
 ```
 
+NB: notRequired is a conditional test, if the field has no value, then notRequired will stop any other validations
+running, without causing an error to be displayed. You can write your own conditional tests to handle any
+field or cross field tests you like. I have included examples of this to make it easier.
+
 ```html
 <form data-validator-config="config.form1.form1">
 <input type="text" name="firstname" data-validator-config="config.form1.firstname">
@@ -95,6 +100,12 @@ var config = {
 Custom validator function
 -------------------------
 
-
+```javascript
+Validator.rules.minLength = function(element, args, errors, displayFunction){
+    var len = args[0] || 1;
+    var passes = ($(element).val()).length > len;
+    return passes?{}:{minLength:JS.STRING.format(Validator.messages.minLength,len)};
+},
+```
 
 

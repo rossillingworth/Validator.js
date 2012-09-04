@@ -97,13 +97,15 @@ field or cross field tests you like. I have included examples of this to make it
 
 
 
-Custom validator function
--------------------------
+Custom validator functions
+--------------------------
+
+A simple minimum length function. Notice that an empty object ({}) is returned if it passes.
 
 ```javascript
 Validator.rules.minLength = function(element, args, errors, displayFunction){
     var len = args[0] || 1;
-    var passes = ($(element).val()).length > len;
+    var passes = JS.DOM.FORM.getValue(element).length >= len;
     return passes?{}:{minLength:JS.STRING.format(Validator.messages.minLength,len)};
 },
 ```

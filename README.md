@@ -32,6 +32,9 @@ Extras:
 * simple error handling alerts developer to problems
 
 
+Examples:
+=
+
 A Simple Form Validation
 ------------------------
 
@@ -48,3 +51,49 @@ This is a simple example, showing how easy it is to add Validator to your form.
 <input type="submit">
 </form>
 ```
+
+An advanced Form Validation
+---------------------------
+
+Using a config object, specify config in field attribute.
+
+```javascript
+var config = {
+    form1:{
+        form1:{
+            rules:"validateChildren",
+            errorDisplay:"showFormErrors"
+        },
+        firstname:{
+            rules:"required,noNumbers",
+            errorDisplay:"showFieldErrors"
+        },
+        lastname:{
+            rules:"notRequired,noNumbers",
+            errorDisplay:"showFieldErrors"
+        }
+        email:{
+            rules:"required,email",
+            errorDisplay:"showFieldErrors"
+        }
+    }
+};
+```
+
+```html
+<form data-validator-config="config.form1.form1">
+<input type="text" name="firstname" data-validator-config="config.form1.firstname">
+<input type="text" name="lastname" data-validator-config="config.form1.lastname">
+<input type="text" name="email" data-validator-config="config.form1.email">
+<input type="submit">
+</form>
+```
+
+
+
+Custom validator function
+-------------------------
+
+
+
+

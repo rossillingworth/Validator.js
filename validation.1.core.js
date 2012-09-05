@@ -100,7 +100,6 @@ var Validator = {
                     "To stop seeing this, set the 'errorDisplay' property in your config.",
                     "A console log has been generated showing the element that caused this."
                 ].join("\n");
-                console.log("alertError displayed for:", element);
                 for(e in errors){
                     errorStr += JS.STRING.format("test[%1]\n - fails with message[%2]\n",e,errors[e]);
                 }

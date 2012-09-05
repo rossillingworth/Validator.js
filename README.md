@@ -5,7 +5,7 @@ Validator.js is a **configuration and binding system for form validation**.
 For each field specify the validation functions and provide arguments if required.
 Validator handles everything else.
 
-[View Demo:] []
+[View Demo] []
 
 [View Demo]: http://jsfiddle.net/rossillingworth/yKZWK/11/embedded/result/
 

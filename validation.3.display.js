@@ -62,7 +62,7 @@ _.extend(Validator.display,{
         }
     },
 
-    show_Camelot_Error:function(element, errors){
+    show_valid_or_Error:function(element, errors){
         var $element = $(element);
         var $item = $element.closest(".item");
         $item.removeClass("error").removeClass("valid");

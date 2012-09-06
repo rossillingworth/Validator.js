@@ -139,7 +139,8 @@ var Validator = {
                 }
             }
             // run rule
-            var args = JS.DOM.DATA.getElementData(element,ruleName,this.configAttributeName, false);
+            // check ruleName is a String, as could be a Function
+            var args = (_.isString(ruleName))?JS.DOM.DATA.getElementData(element,ruleName,this.configAttributeName, false):false;
             return rule(element, args, errors, displayFunction);
         }
     },
@@ -196,7 +197,7 @@ var Validator = {
         if(!displayFunc){
             throw new Error("Unknown Display Function: " + displayName);
         }
-        var args = JS.DOM.DATA.getElementData(element,displayName,this.configAttributeName, false);
+        var args = (_.isString(displayName))?JS.DOM.DATA.getElementData(element,displayName,this.configAttributeName, false):false;
         return displayFunc(element, errors, args);
     },
 

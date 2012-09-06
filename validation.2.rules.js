@@ -22,7 +22,7 @@ _.extend(Validator.rules,{
      */
     validateChildren:function(element, args , errors, displayFunction){
         var children = JS.DOM.FORM.getFormElements(element);
-        children = children.filter(JS.DOM.isVisible);
+        children = _.filter(children,JS.DOM.isVisible);
         // iterate children
         _.each(children,function(child){
             errors = _.extend(errors,Validator.validate(child));

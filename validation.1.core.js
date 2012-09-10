@@ -1,6 +1,6 @@
 // <input data-rules="required email minLength validateParents" data-minLength="3" data-required="3" data-email="@camelot,73,'a lot of text'">
-// <input data-validator-config="myObj.myConfig.configObjectName">
 
+// <input data-validator-config="myObj.myConfig.configObjectName">
 //var myObj.myConfig.configObjectName = {
 //    changeRules:"required email minLength",
 //    submitRules:"",
@@ -10,7 +10,7 @@
 //    sendMessage:function(){}
 //};
 
-
+// required,minLenght & maxLength,email & validateParent
 
 /**
  * go through a list of arguments, return the first one that validates
@@ -37,6 +37,7 @@ var Validator = {
      * DO NOT GO TO PRODUCTION WITH THIS SET TO TRUE
      */
     debug: (document.location.hostname == "localhost")?true:false,
+    validateInvisible:false,
     configAttributeName:"validator-config",
 
     /**
@@ -76,7 +77,7 @@ var Validator = {
     },
     rules:{
         required:function(element, args, errors, displayFunction){
-            var passesTest = ($(element).val());
+            var passesTest = JS.DOM.FORM.getValue(element).length > 0;
             return (passesTest)?{}:{required:Validator.messages.required};
         },
         notRequired:function(element, args, errors, displayFunction){
@@ -87,7 +88,7 @@ var Validator = {
         },
         minLength:function(element, args, errors, displayFunction){
             var len = args[0] || 1;
-            var passes = ($(element).val()).length > len;
+            var passes = JS.DOM.FORM.getValue(element).length >= len;
             return passes?{}:{minLength:JS.STRING.format(Validator.messages.minLength,len)};
         }
     },
@@ -109,7 +110,7 @@ var Validator = {
     },
 
     runRegex:function(element, regexRuleName){
-        var value = $(element).val();
+        var value = JS.DOM.FORM.getValue(element);
         var regexRule = this.regex[regexRuleName];
         var parses = regexRule.pattern.test(value);
         var errorObj = {};

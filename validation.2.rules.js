@@ -38,6 +38,26 @@ _.extend(Validator.rules,{
         return errors;
     },
     /**
+     * Cause another element to revalidate
+     * args - a comma seperated list of element IDs
+     * will not return any errors
+     *
+     * @param element
+     * @param args
+     * @param errors
+     * @param displayFunction
+     */
+    reValidate:function(element, args , errors, displayFunction){
+        var others = args.split(",");
+        others = _.map(others,JS.STRING.trim);
+        others = _.map(others,document.getElementById);
+
+        _.each(others,function(otherElement){
+            Validator.validate(otherElement);
+        })
+        return {};
+    },
+    /**
      * An example of what happens when the test is asynchronous
      * ie: you can make a server request and display response
      *

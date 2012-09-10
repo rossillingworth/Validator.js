@@ -195,9 +195,7 @@ var Validator = {
      */
     runDisplay:function(element, displayName, errors){
         var displayFunc = (_.isFunction(displayName))?displayName:JS.OBJECT.getProperty(this.display,displayName);
-        if(!displayFunc){
-            throw new Error("Unknown Display Function: " + displayName);
-        }
+        JS.debug && JS.ASSERT.is(_.isFunction(displayFunc),true,"runDisplay:unable to find " + displayName);
         var args = (_.isString(displayName))?JS.DOM.DATA.getElementData(element,displayName,this.configAttributeName, false):false;
         return displayFunc(element, errors, args);
     },

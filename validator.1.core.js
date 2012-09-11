@@ -251,6 +251,8 @@ var Validator = {
 
     validate:function(element){
 
+        JS.debug && JS.ASSERT.is( element && element.nodeType != undefined,true,"validate: element is not a node");
+
         // var to only allow rules to run once, ie: when allowed == true
         var allowed = (allowed == undefined)?true:false;
 

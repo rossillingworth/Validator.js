@@ -71,5 +71,19 @@ _.extend(Validator.rules,{
             errors["addedAjax"] = "added an ajax call";
             Validator.display[displayFunction].call(this,element,errors);
         }, 2000);
+    },
+    /**
+     * Add this to a form to disabled all invisible element
+     * and stop them being submitted
+     *
+     * @param element
+     * @param args
+     * @param errors
+     * @param displayFunction
+     * @return {Object}
+     */
+    disableFormFieldsIfHidden:function(element, args , errors, displayFunction){
+        JS.DOM.FORM.disableHiddenFormFields(element);
+        return {};
     }
 });

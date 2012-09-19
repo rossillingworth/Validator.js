@@ -1,9 +1,8 @@
-// <input data-rules="required email minLength validateParents" data-minLength="3" data-required="3" data-email="@camelot,73,'a lot of text'">
+// <input data-rules="required,email,minLength,validateParents" data-minLength="3" data-required="3" data-email="@camelot,73,'a lot of text'">
 
 // <input data-validator-config="myObj.myConfig.configObjectName">
 //var myObj.myConfig.configObjectName = {
-//    changeRules:"required email minLength",
-//    submitRules:"",
+//    rules:"required,email,minLength",
 //    email:"@camelot,73,'a lot of text'",
 //    minLength:"3",
 //    sendMessage:""
@@ -37,6 +36,7 @@ var Validator = {
      * DO NOT GO TO PRODUCTION WITH THIS SET TO TRUE
      */
     debug: (document.location.hostname == "localhost")?true:false,
+    submitting:false,
     validateInvisible:false,
     configAttributeName:"validator-config",
 
@@ -49,6 +49,10 @@ var Validator = {
     StopValidationException:function(message){
         this.message = message;
         this.name = "StopValidationException";
+    },
+    IgnoreRulesAndDisplayException:function(message){
+        this.message = message;
+        this.name = "IgnoreRulesAndDisplayException";
     },
 
     /**
@@ -259,13 +263,19 @@ var Validator = {
         // get data-attr based rules
         var rules = this.parseRules(JS.DOM.DATA.getElementData(element,"rules",this.configAttributeName, false));
         var displays = this.parseDisplay(JS.DOM.DATA.getElementData(element, "errorDisplay",this.configAttributeName, "alertError"));
-
-        // run rules
         var errors = {};
-        errors = this.runAllRules(element, rules, errors, displays);
 
-        // display result: ie: valid or errors
-        this.runAllDisplays(element,displays,errors);
+        // allow all rules and display to be skipped
+        try{
+            // run rules
+            errors = this.runAllRules(element, rules, errors, displays);
+            // display result: ie: valid or errors
+            this.runAllDisplays(element,displays,errors);
+        }catch(e){
+            if(e.name != "IgnoreRulesAndDisplayException"){
+                throw e;
+            }
+        }
 
         // stop submit propagating
         return errors;
@@ -279,7 +289,11 @@ var Validator = {
     triggerValidation:function(event){
         try{
             var element = event.target;
+            if(event.data && event.data.submitting){
+                Validator.submitting = true;
+            }
             var errors = this.validate(element);
+            Validator.submitting = false;
             return _.isEmpty(errors);
         }catch(e){
             // this will catch and stop the form from submitting if there are errors
@@ -291,7 +305,7 @@ var Validator = {
         }
     }
 
-}
+};
 
 // TODO: get config object rules first, as can then be overridden by tag attr?
 

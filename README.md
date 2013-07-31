@@ -7,8 +7,8 @@ Validator handles everything else.
 
 [View Demo] [] / [view demo src] []
 
-[View Demo]: http://jsfiddle.net/rossillingworth/yKZWK/11/embedded/result/
-[view demo src]: http://jsfiddle.net/rossillingworth/yKZWK/11/
+[View Demo]: http://jsfiddle.net/rossillingworth/yKZWK/embedded/result/
+[view demo src]: http://jsfiddle.net/rossillingworth/yKZWK/
 
 Our easily extended mixture of functions and regex is then used to validate your forms.
 I am providing a few basic examples, but you will need to add any custom functions.
